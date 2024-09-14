@@ -22,14 +22,17 @@
 
 package parallel
 
-import "sync"
+import (
+	"fmt"
+	"sync"
+)
 
 type Parallel struct {
 	wg        *sync.WaitGroup
 	que       []*Queue
 	childWg   *sync.WaitGroup
 	children  []*Parallel
-	exception Exception
+	exception ExceptionProxy
 }
 
 func NewParallel() *Parallel {
@@ -42,7 +45,7 @@ func NewParallel() *Parallel {
 	}
 }
 
-func (p *Parallel) Exception(exception Exception) *Parallel {
+func (p *Parallel) Exception(exception ExceptionProxy) *Parallel {
 	p.exception = exception
 	return p
 }
@@ -53,11 +56,11 @@ func (p *Parallel) Add(f any, args ...any) *Executor {
 
 func (p *Parallel) Queue() *Queue {
 	q := NewQueue()
-	p.AddQueue(q)
+	p.addQueue(q)
 	return q
 }
 
-func (p *Parallel) AddQueue(q ...*Queue) *Parallel {
+func (p *Parallel) addQueue(q ...*Queue) *Parallel {
 	p.wg.Add(len(q))
 	p.que = append(p.que, q...)
 	return p
@@ -66,49 +69,51 @@ func (p *Parallel) AddQueue(q ...*Queue) *Parallel {
 func (p *Parallel) GiveBirth() *Parallel {
 	child := NewParallel()
 	child.exception = p.exception
-	p.ChildJoin(child)
+	p.childJoin(child)
 	return child
 }
 
-func (p *Parallel) ChildJoin(child ...*Parallel) *Parallel {
-	p.childWg.Add(len(p.children))
+func (p *Parallel) childJoin(child ...*Parallel) *Parallel {
+	p.childWg.Add(len(child))
 	p.children = append(p.children, child...)
 	return p
 }
 
-func (p *Parallel) Wait() {
+func (p *Parallel) Wait(args ...any) {
 	for _, child := range p.children {
 		go func(ch *Parallel) {
-			ch.Wait()
+			ch.Wait(args...)
 			p.childWg.Done()
 		}(child)
 	}
 	p.childWg.Wait()
-	p.do()
+	fmt.Println("child wait finished")
+	p.do(args...)
 	p.wg.Wait()
 }
 
-func (p *Parallel) do() {
+func (p *Parallel) do(args ...any) {
 	if len(p.que) == 1 {
-		p.SafeWrapper(p.que[0])
+		p.safeWrapper(p.que[0], args...)
 		return
 	}
 	for _, q := range p.que {
-		go p.SafeWrapper(q)
+		go p.safeWrapper(q, args...)
 	}
 }
 
-func (p *Parallel) SafeWrapper(q *Queue) {
+func (p *Parallel) safeWrapper(q *Queue, args ...any) {
 	defer func() {
 		err := recover()
 		switch err {
 		case ErrNotAFunction, ErrArgInputLengthNotMatch, ErrResTypeNotAPtr, ErrResOutOfRange, ErrResNil:
 			// basic err, throw panic again
 			panic(err)
-		case nil:
-			p.wg.Done()
 		default:
-			p.exception.Deal()(err)
+			p.wg.Done()
+			if err != nil {
+				p.exception.Deal(args...)(err)
+			}
 		}
 	}()
 	q.Purge()

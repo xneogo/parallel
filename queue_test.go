@@ -14,29 +14,22 @@
  *　　 ┗━┓┓┏━━┳┓┏┛
  *　　   ┃┫┫  ┃┫┫
  *      ┗┻┛　 ┗┻┛
- @Time    : 2024/9/12 -- 16:42
+ @Time    : 2024/9/13 -- 09:53
  @Author  : 亓官竹 ❤️ MONEY
  @Copyright 2024 亓官竹
- @Description: usage.go
+ @Description: queue_test.go
 */
 
-package main
+package parallel
 
 import (
 	"fmt"
-	"github.com/qiguanzhu/parallel"
 	"github.com/qiguanzhu/parallel/example"
+	"testing"
 	"time"
 )
 
-/*
-start
-CallString | CallDts | CallOther
-           |         |
-End
-*/
-
-func main() {
+func Test(*testing.T) {
 	var cs string
 	var csd int
 	var dts string
@@ -44,21 +37,18 @@ func main() {
 	var obj2 = &example.Obj{Name: "hello again"}
 	var obj2r string
 
-	p := parallel.NewParallel()
 	startTime := time.Now().Unix()
-	// normally you can use like this
-	// add a func
-	p.Add(example.CallString, "Hello World").SetRes(&cs, &csd)
-	p.Add(example.CallDts, 123).SetRes(&dts)
-	p.Add(example.CallOther, 1, 2).SetRes(&obj)
-	p.Add(obj2.String).SetRes(&obj2r)
-	// block and wait until all func done
-	// total cost of time should be 4 seconds
-	p.Wait()
+	que := NewQueue()
+	que.Push(example.CallString, "Hello World").SetRes(&cs, &csd)
+	que.Push(example.CallDts, 123).SetRes(&dts)
+	que.Push(example.CallOther, 1, 2).SetRes(&obj)
+	que.Push(obj2.String).SetRes(&obj2r)
+	que.Purge()
 	endTime := time.Now().Unix()
-	fmt.Println(cs, csd) // Hello World 0
-	fmt.Println(dts)     // 123
-	fmt.Println(obj)     // called: 1~2
-	fmt.Println(obj2r)   // hello again
-	fmt.Printf("time cost: %d s\n", endTime-startTime)
+
+	fmt.Println(cs, csd)
+	fmt.Println(dts)
+	fmt.Println(obj)
+	fmt.Println(obj2r)
+	fmt.Printf("time cost:%d s\n", endTime-startTime)
 }

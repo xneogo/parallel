@@ -34,11 +34,11 @@ type Dealer func(any)
 
 type Exception struct{}
 
-func DefaultException() Exception {
+func DefaultException() ExceptionProxy {
 	return Exception{}
 }
 
-func (e Exception) Deal() Dealer {
+func (e Exception) Deal(args ...any) Dealer {
 	return func(err any) {
 		fmt.Println(err)
 	}

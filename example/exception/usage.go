@@ -14,35 +14,35 @@
  *　　 ┗━┓┓┏━━┳┓┏┛
  *　　   ┃┫┫  ┃┫┫
  *      ┗┻┛　 ┗┻┛
- @Time    : 2024/9/12 -- 15:28
+ @Time    : 2024/9/13 -- 10:05
  @Author  : 亓官竹 ❤️ MONEY
  @Copyright 2024 亓官竹
- @Description: queue.go
+ @Description: usage.go
 */
 
-package parallel
+package main
 
-type Queue struct {
-	handlers []*Executor
-}
+import (
+	"fmt"
+	"github.com/qiguanzhu/parallel"
+	"github.com/qiguanzhu/parallel/example"
+)
 
-func NewQueue() *Queue {
-	return &Queue{handlers: []*Executor{}}
-}
+type MyException struct{}
 
-func (q *Queue) Push(f any, args ...any) *Executor {
-	h := NewExecutor(f, args...)
-	q.push(h)
-	return h
-}
-
-func (q *Queue) push(h *Executor) *Queue {
-	q.handlers = append(q.handlers, h)
-	return q
-}
-
-func (q *Queue) Purge() {
-	for _, h := range q.handlers {
-		h.Do()
+func (e MyException) Deal(args ...any) parallel.Dealer {
+	return func(err any) {
+		fmt.Println(err, args)
 	}
+}
+
+func main() {
+	var a int
+	bc := new(example.BadCall)
+
+	p := parallel.NewParallel()
+	p.Exception(MyException{})
+	p.Add(bc.Assignment2NilMap)
+	p.Add(bc.SliceOutOfRange).SetRes(&a)
+	p.Wait(1, 2, 3)
 }
