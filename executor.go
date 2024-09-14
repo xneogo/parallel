@@ -73,6 +73,12 @@ func (h *Executor) Do() {
 	outputs := fValue.Call(inputs)
 	for i, r := range h.res {
 		value := reflect.ValueOf(r)
-		value.Elem().Set(outputs[i])
+		// There are 2 ways of output: value or ptr
+		// so if r and output[i] are both ptr, we need specify their means to set value
+		if outputs[i].Type().Kind() != reflect.Ptr {
+			value.Elem().Set(outputs[i])
+		} else {
+			value.Elem().Set(outputs[i].Elem())
+		}
 	}
 }

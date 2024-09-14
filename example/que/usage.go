@@ -14,7 +14,7 @@
  *　　 ┗━┓┓┏━━┳┓┏┛
  *　　   ┃┫┫  ┃┫┫
  *      ┗┻┛　 ┗┻┛
- @Time    : 2024/9/12 -- 16:42
+ @Time    : 2024/9/13 -- 09:37
  @Author  : 亓官竹 ❤️ MONEY
  @Copyright 2024 亓官竹
  @Description: usage.go
@@ -31,8 +31,10 @@ import (
 
 /*
 start
-CallString | CallDts | CallOther
-           |         |
+CallString |
+CallDts    |
+CallOther  |
+Obj.String |
 End
 */
 
@@ -46,14 +48,16 @@ func main() {
 
 	p := parallel.NewParallel()
 	startTime := time.Now().Unix()
-	// normally you can use like this
-	// add a func
-	p.Add(example.CallString, "Hello World").SetRes(&cs, &csd)
-	p.Add(example.CallDts, 123).SetRes(&dts)
-	p.Add(example.CallOther, 1, 2).SetRes(&obj)
-	p.Add(obj2.String).SetRes(&obj2r)
+	// process func inline
+	// add a queue to parallel
+	que := p.Queue()
+	que.Push(example.CallString, "Hello World").SetRes(&cs, &csd)
+	que.Push(example.CallDts, 123).SetRes(&dts)
+	que.Push(example.CallOther, 1, 2).SetRes(&obj)
+	que.Push(obj2.String).SetRes(&obj2r)
 	// block and wait until all func done
-	// total cost of time should be 4 seconds
+	// total cost of time should be 1+2+3+4=10 seconds
+	fmt.Println(que)
 	p.Wait()
 	endTime := time.Now().Unix()
 	fmt.Println(cs, csd) // Hello World 0
