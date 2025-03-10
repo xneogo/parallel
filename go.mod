@@ -1,4 +1,4 @@
-module github.com/qiguanzhu/parallel
+module github.com/eva-nigouki/parallel
 
 go 1.22.0
 

@@ -25,8 +25,8 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/qiguanzhu/parallel"
-	"github.com/qiguanzhu/parallel/example"
+	"github.com/eva-nigouki/parallel"
+	"github.com/eva-nigouki/parallel/examples"
 	"time"
 )
 
@@ -46,8 +46,8 @@ func main() {
 	// b = &example.B{}
 	// a := new(example.A)
 	// b := new(example.B)
-	var a example.A
-	var b example.B
+	var a examples.A
+	var b examples.B
 	var res map[string]interface{}
 	ctx := context.Background()
 
@@ -59,11 +59,11 @@ func main() {
 	// we use A and B to build a result suit for http route endpoints
 	// when query process of A and B has nothing in common, then they can be speed up by parallel
 	childA := p.GiveBirth()
-	childA.Add(example.GetInfoA, ctx, int64(1)).SetRes(&a) // cost 1 second
+	childA.Add(examples.GetInfoA, ctx, int64(1)).SetRes(&a) // cost 1 second
 	childB := p.GiveBirth()
-	childB.Add(example.GetInfoB, ctx, int64(2)).SetRes(&b) // cost 2 seconds
+	childB.Add(examples.GetInfoB, ctx, int64(2)).SetRes(&b) // cost 2 seconds
 	// childA and childB will be processed parallel first
-	p.Add(example.AAndB, &a, &b).SetRes(&res) // cost 1 second
+	p.Add(examples.AAndB, &a, &b).SetRes(&res) // cost 1 second
 	p.Wait()
 	endTime := time.Now().Unix() // cost max(1,2) + 1 = 3s
 	fmt.Println(a)

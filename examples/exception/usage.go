@@ -24,8 +24,8 @@ package main
 
 import (
 	"fmt"
-	"github.com/qiguanzhu/parallel"
-	"github.com/qiguanzhu/parallel/example"
+	"github.com/eva-nigouki/parallel"
+	"github.com/eva-nigouki/parallel/examples"
 )
 
 type MyException struct{}
@@ -38,7 +38,7 @@ func (e MyException) Deal(args ...any) parallel.Dealer {
 
 func main() {
 	var a int
-	bc := new(example.BadCall)
+	bc := new(examples.BadCall)
 
 	p := parallel.NewParallel()
 	p.Exception(MyException{})

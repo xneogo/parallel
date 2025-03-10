@@ -20,7 +20,7 @@
  @Description: fs.go
 */
 
-package example
+package examples
 
 import (
 	"context"

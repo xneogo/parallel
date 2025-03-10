@@ -24,8 +24,8 @@ package main
 
 import (
 	"fmt"
-	"github.com/qiguanzhu/parallel"
-	"github.com/qiguanzhu/parallel/example"
+	"github.com/eva-nigouki/parallel"
+	"github.com/eva-nigouki/parallel/examples"
 	"time"
 )
 
@@ -40,8 +40,8 @@ func main() {
 	var cs string
 	var csd int
 	var dts string
-	var obj *example.Obj
-	var obj2 = &example.Obj{Name: "hello again"}
+	var obj *examples.Obj
+	var obj2 = &examples.Obj{Name: "hello again"}
 	var obj2r string
 
 	p := parallel.NewParallel()
@@ -49,10 +49,10 @@ func main() {
 	// process func inline
 	// add a queue to parallel
 	que1 := p.Queue()
-	que1.Push(example.CallString, "Hello World").SetRes(&cs, &csd)
-	que1.Push(example.CallOther, 1, 2).SetRes(&obj)
+	que1.Push(examples.CallString, "Hello World").SetRes(&cs, &csd)
+	que1.Push(examples.CallOther, 1, 2).SetRes(&obj)
 	que2 := p.Queue()
-	que2.Push(example.CallDts, 123).SetRes(&dts)
+	que2.Push(examples.CallDts, 123).SetRes(&dts)
 	p.Add(obj2.String).SetRes(&obj2r)
 	// block and wait until all func done
 	// total cost of time should be max(1+3,2,4)=4 seconds
