@@ -24,8 +24,8 @@ package main
 
 import (
 	"fmt"
-	"github.com/eva-nigouki/parallel"
-	"github.com/eva-nigouki/parallel/examples"
+	"github.com/xneogo/parallel"
+	"github.com/xneogo/parallel/examples"
 	"time"
 )
 

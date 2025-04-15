@@ -24,7 +24,7 @@ package parallel
 
 import (
 	"fmt"
-	"github.com/eva-nigouki/parallel/examples"
+	"github.com/xneogo/parallel/examples"
 	"testing"
 	"time"
 )
